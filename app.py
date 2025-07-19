@@ -7,6 +7,7 @@ import os
 import unicodedata
 import urllib.parse
 import datetime
+import shutil
 
 # Yes/No input
 
@@ -200,6 +201,20 @@ def ExtractCopyrightAndDate(argument):
 
     return COPYRIGHT, YEAR
 
+app_dir = os.path.dirname(os.path.abspath(__file__))
+mediaex_dir = os.path.join(app_dir, "mediaex")
+os.makedirs(mediaex_dir, exist_ok=True)
+
+# Clear all files in mediaex_dir
+for filename in os.listdir(mediaex_dir):
+    file_path = os.path.join(mediaex_dir, filename)
+    try:
+        if os.path.isfile(file_path) or os.path.islink(file_path):
+            os.unlink(file_path)
+        elif os.path.isdir(file_path):
+            shutil.rmtree(file_path)
+    except Exception as e:
+        print(f'Failed to delete {file_path}. Reason: {e}')
         
 TOTALDISCS = 1
 DISCNUMBER = 1
@@ -264,6 +279,7 @@ if not abort:
 
     for song in songs_elem:
 
+        
         ITUNESCATALOGID = ExtractCatalogID(song)
         TITLE = ExtractSongTitle(song)
         TITLESORT = TITLE
@@ -272,33 +288,33 @@ if not abort:
         ARTIST, ARTISTS = ExtractArtists(song, ALBUMARTIST)
         ARTISTSORT = ARTIST
         
-        print("Album Title: ", ALBUM)
-        print("Album Artist: ", ALBUMARTIST)
-        print('Album Sort: ', ALBUMSORT)
-        print('Artist: ', ARTIST)
-        print('Artist Sort: ', ARTISTSORT)
-        if ARTISTS:
-            print('Artists: ')
-            for artists in ARTISTS:
-                print(artists)
-        print('Compilation: ', COMPILATION)
-        print('Copyright: ', COPYRIGHT)
-        print('Disc Number: ', DISCNUMBER)
-        print('Genre: ', GENRE)
-        print("Itunes advisory: ", ITUNESADVISORY)
-        print("Itunes Album ID: ", ITUNESALBUMID)
-        print("Itunes Artist ID: ", ITUNESARTISTID)
-        print("ItunesCatalog ID: ", ITUNESCATALOGID)
-        print('Itunes Genre ID: ', ITUNESGENREID)
-        print('Itunes Gapless: ', ITUNESGAPLESS)
-        print('Itunes Mediatype: ', ITUNESMEDIATYPE)
-        print("Title: ", TITLE)
-        print("Title Sort: ", TITLESORT)
-        print("Total Discs: ", TOTALDISCS)
-        print("Total tracks: ", TOTALTRACKS)
-        print("Track number: ", TRACKNUMBER)
-        print("Year: ", YEAR)
-        print('\n')
+        FILENAME = os.path.join(mediaex_dir, TRACKNUMBER + " " + TITLE + ".txt")
+        with open(FILENAME, "w", encoding="utf-8") as f:
+            print("ALBUM           | ", ALBUM, file=f)
+            print("ALBUMARTIST     | ", ALBUMARTIST, file=f)
+            print('ALBUMSORT       | ', ALBUMSORT, file=f)
+            print('ARTIST          | ', ARTIST, file=f)
+            print('ARTISTSORT      | ', ARTISTSORT, file=f)
+            if ARTISTS:
+                for artists in ARTISTS:
+                    print('ARTISTS         | ', artists, file=f)
+            print('COMPILATION     | ', COMPILATION, file=f)
+            print('COPYRIGTH       | ', COPYRIGHT, file=f)
+            print('DISCNUMBER      | ', DISCNUMBER, file=f)
+            print('GENRE           | ', GENRE, file=f)
+            print("ITUNESADVISORY  | ", ITUNESADVISORY, file=f)
+            print("ITUNESALBUMID   | ", ITUNESALBUMID, file=f)
+            print("ITUNESARTISTID  | ", ITUNESARTISTID, file=f)
+            print("ITUNESCATALOGID | ", ITUNESCATALOGID, file=f)
+            print('ITUNESGENREID   | ', ITUNESGENREID, file=f)
+            print('ITUNESGAPLESS   | ', ITUNESGAPLESS, file=f)
+            print('ITUNESMEDIATYPE | ', ITUNESMEDIATYPE, file=f)
+            print("TITLE           | ", TITLE, file=f)
+            print("TITLESORT       | ", TITLESORT, file=f)
+            print("TOTALDISCS      | ", TOTALDISCS, file=f)
+            print("TOTALTRACKS     | ", TOTALTRACKS, file=f)
+            print("TRACK           | ", TRACKNUMBER, file=f)
+            print("YEAR            | ", YEAR, file=f)
 
     # Find the <source> element with type="image/jpeg"
 
@@ -310,10 +326,9 @@ if not abort:
     urls = re.findall(r'(https?://[^\s,]+)\s+\d+w', srcset)
     if urls:
         last_url = urls[-1]
-        print("Image URL:", last_url)
         img_data = requests.get(last_url).content
-        with open('632x632bb-60.jpg', 'wb') as handler:
-            handler.write(img_data)
-        os.startfile('632x632bb-60.jpg')
+        app_dir = os.path.dirname(os.path.abspath(__file__))
+        image_path = os.path.join(mediaex_dir, 'artwork.jpg')
 
-driver.quit()
+        with open(image_path, 'wb') as handler:
+            handler.write(img_data)

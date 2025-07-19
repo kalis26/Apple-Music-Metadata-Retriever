@@ -1,0 +1,22 @@
+ALBUM           |  GNX
+ALBUMARTIST     |  Kendrick Lamar
+ALBUMSORT       |  GNX
+ARTIST          |  Kendrick Lamar
+ARTISTSORT      |  Kendrick Lamar
+COMPILATION     |  0
+COPYRIGTH       |  ℗ 2024 pgLang, under exclusive license to Interscope Records
+DISCNUMBER      |  1
+GENRE           |  Hip-Hop/Rap
+ITUNESADVISORY  |  1
+ITUNESALBUMID   |  1781270319
+ITUNESARTISTID  |  368183298
+ITUNESCATALOGID |  1781270545
+ITUNESGENREID   |  18
+ITUNESGAPLESS   |  0
+ITUNESMEDIATYPE |  Normal
+TITLE           |  peekaboo (feat. AzChike)
+TITLESORT       |  peekaboo (feat. AzChike)
+TOTALDISCS      |  1
+TOTALTRACKS     |  12
+TRACK           |  9
+YEAR            |  2024-11-22T12:00:00Z

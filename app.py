@@ -8,6 +8,7 @@ import unicodedata
 import urllib.parse
 import datetime
 import shutil
+from colorama import Fore, Back, Style, init
 
 # Yes/No input
 
@@ -204,6 +205,12 @@ def ExtractCopyrightAndDate(argument):
 
     return COPYRIGHT, YEAR
 
+def menu():
+
+    
+
+    return
+
 app_dir = os.path.dirname(os.path.abspath(__file__))
 mediaex_dir = os.path.join(app_dir, "mediaex")
 os.makedirs(mediaex_dir, exist_ok=True)
@@ -218,7 +225,9 @@ for filename in os.listdir(mediaex_dir):
             shutil.rmtree(file_path)
     except Exception as e:
         print(f'Failed to delete {file_path}. Reason: {e}')
-        
+
+init(autoreset=True)       
+
 TOTALDISCS = 1
 DISCNUMBER = 1
 COMPILATION = 0
@@ -248,7 +257,7 @@ abort = False
 while not found:
 
     if id == len(grid_elem):
-        print("No results found for your search. Aborting...")
+        print(Fore.RED + "\nNo results found for your search. Aborting...")
         found = True
         abort = True
     else:
@@ -335,3 +344,5 @@ if not abort:
 
         with open(image_path, 'wb') as handler:
             handler.write(img_data)
+
+    print(Fore.GREEN + '\nMetadata retrieved successfully. Access it in the mediaex folder.')

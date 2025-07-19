@@ -49,8 +49,8 @@ def ExtractAlbumTitle(argument):
     
 def ExtractArtistAndID(argument):
 
-    albumartist_elem = argument.find_element(By.CSS_SELECTOR, '.headings__subtitles.svelte-1uuona0 a[data-testid="click-action"]')
-    artist_url = albumartist_elem.get_attribute("href")
+    albumartist_elem = argument.find_elements(By.CSS_SELECTOR, '.headings__subtitles.svelte-1uuona0 a[data-testid="click-action"]')
+    artist_url = albumartist_elem[0].get_attribute("href")
 
     parsed_artist = urllib.parse.urlparse(artist_url)
     last_artist_segment = parsed_artist.path.rstrip('/').split('/')[-1]
@@ -60,7 +60,10 @@ def ExtractArtistAndID(argument):
         match = re.search(r'(\d+)(?!.*\d)', parsed_artist.path)
         ARTISTID = match.group(1) if match else ""
 
-    ALBUMARTIST = albumartist_elem.text.strip()
+    if len(albumartist_elem) > 1:
+        ALBUMARTIST = ', '.join([elem.text.strip() for elem in albumartist_elem])
+    else:
+        ALBUMARTIST = albumartist_elem[0].text.strip()
 
     return ALBUMARTIST, ARTISTID
 

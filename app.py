@@ -4,9 +4,9 @@ import requests
 import re
 import os
 
-title = input("Enter the name of the song/album :")
+title = input("Enter the name of the song/album: ")
 artist = input("Enter the name of the artist: ")
-url = f"https://music.apple.com/fr/search?term={title.replace(' ', '%20')}%20{artist.replace('', '%20')}"
+url = f"https://music.apple.com/fr/search?term={title.replace(' ', '%20')}%20{artist.replace(' ', '%20')}"
 
 driver = webdriver.Chrome()
 driver.get(url)

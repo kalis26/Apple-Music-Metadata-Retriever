@@ -11,6 +11,11 @@ Whether you're a music enthusiast, a developer working on media applications, or
   
 </div>
 
+<div align="center">
+  <img src="resources/demo.gif">
+  <img src="resources/metadata.png" width=1080px>
+</div>
+
 ## Core Features
 - Search for songs or albums using natural text input.
 - Extract detailed metadata, including:

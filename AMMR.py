@@ -6,7 +6,6 @@ import requests
 import re
 import os
 import sys
-import subprocess
 import contextlib
 import unicodedata
 import urllib.parse
@@ -249,11 +248,11 @@ def menu():
 
 
 app_dir = os.path.dirname(os.path.abspath(__file__))
-mediaex_dir = os.path.join(app_dir, "mediaex")
-os.makedirs(mediaex_dir, exist_ok=True)
+metadata_dir = os.path.join(app_dir, "metadata")
+os.makedirs(metadata_dir, exist_ok=True)
 
-for filename in os.listdir(mediaex_dir):
-    file_path = os.path.join(mediaex_dir, filename)
+for filename in os.listdir(metadata_dir):
+    file_path = os.path.join(metadata_dir, filename)
     try:
         if os.path.isfile(file_path) or os.path.islink(file_path):
             os.unlink(file_path)
@@ -351,7 +350,7 @@ while not quit:
                     ARTIST, ARTISTS = ExtractArtists(song, ALBUMARTIST)
                     ARTISTSORT = ARTIST
                     
-                    FILENAME = os.path.join(mediaex_dir, TRACKNUMBER + " " + TITLE + ".txt")
+                    FILENAME = os.path.join(metadata_dir, TRACKNUMBER + " " + TITLE + ".txt")
                     with open(FILENAME, "w", encoding="utf-8") as f:
                         print("ALBUM           | ", ALBUM, file=f)
                         print("ALBUMARTIST     | ", ALBUMARTIST, file=f)
@@ -391,12 +390,12 @@ while not quit:
                     last_url = urls[-1]
                     img_data = requests.get(last_url).content
                     app_dir = os.path.dirname(os.path.abspath(__file__))
-                    image_path = os.path.join(mediaex_dir, 'artwork.jpg')
+                    image_path = os.path.join(metadata_dir, 'artwork.jpg')
 
                     with open(image_path, 'wb') as handler:
                         handler.write(img_data)
 
-                print(Fore.GREEN + '\nMetadata retrieved successfully. Access it in the mediaex folder.')
+                print(Fore.GREEN + '\nMetadata retrieved successfully. Access it in the metadata folder.')
 
             contin()
 

@@ -221,7 +221,7 @@ def ExtractCopyrightAndDate(argument):
 
     return COPYRIGHT, YEAR
 
-def ExtractMetadata(driver, id):
+def ExtractMetadata(driver, id, metadata_dir):
 
     TOTALDISCS = 1
     DISCNUMBER = 1
@@ -306,11 +306,12 @@ def ExtractMetadata(driver, id):
         if urls:
             last_url = urls[-1]
             img_data = requests.get(last_url).content
-            app_dir = os.path.dirname(os.path.abspath(__file__))
             image_path = os.path.join(metadata_dir, 'artwork.jpg')
 
             with open(image_path, 'wb') as handler:
                 handler.write(img_data)
+
+    return ALBUM, ALBUMARTIST
 
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -365,8 +366,6 @@ while not quit:
     match choice:
         case '1':
 
-            
-
             title = input("Enter the name of the song/album: ")
             artist = input("Enter the name of the artist: ")
             print('\n')
@@ -411,7 +410,7 @@ while not quit:
 
             if not abort:
 
-                ExtractMetadata(driver, id)
+                ExtractMetadata(driver, id, metadata_dir)
 
                 print(Fore.GREEN + '\nMetadata retrieved successfully. Access it in the metadata folder.')
 

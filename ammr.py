@@ -221,6 +221,97 @@ def ExtractCopyrightAndDate(argument):
 
     return COPYRIGHT, YEAR
 
+def ExtractMetadata(driver, id):
+
+    TOTALDISCS = 1
+    DISCNUMBER = 1
+    COMPILATION = 0
+    ITUNESGAPLESS = 0
+    ITUNESMEDIATYPE = "Normal"
+
+    url, ITUNESALBUMID = ExtractAlbumID(driver, id)
+
+    options = webdriver.ChromeOptions()
+    options.add_experimental_option('excludeSwitches', ['enable-logging'])
+    options.add_argument("--headless")
+    options.add_argument("--log-level=3")
+    options.add_argument("--disable-logging")
+    options.add_argument("--disable-gpu")
+    options.add_argument("--no-sandbox")
+
+    service = Service(log_path=os.devnull)
+
+    with suppress_stderr():
+        driver = webdriver.Chrome(service=service, options=options)
+
+    driver.get(url)
+
+    ALBUM = ExtractAlbumTitle(driver)
+    ALBUMSORT = ALBUM
+    ALBUMARTIST, ITUNESARTISTID = ExtractArtistAndID(driver)
+    GENRE = ExtractGenre(driver)
+    ITUNESGENREID = GenreSelection(GENRE)
+    COPYRIGHT, YEAR = ExtractCopyrightAndDate(driver)
+
+    songs_elem = driver.find_elements(By.CLASS_NAME, 'songs-list-row')
+
+    TOTALTRACKS = len(songs_elem)
+
+    for song in songs_elem:
+
+        ITUNESCATALOGID = ExtractCatalogID(song)
+        TITLE = ExtractSongTitle(song)
+        TITLESORT = TITLE
+        TRACKNUMBER = ExtractTrackNumber(song)
+        ITUNESADVISORY = ExtractItunesAdvisory(song)
+        ARTIST, ARTISTS = ExtractArtists(song, ALBUMARTIST)
+        ARTISTSORT = ARTIST
+
+        FILENAME = os.path.join(metadata_dir, TRACKNUMBER + " " + TITLE + ".txt")
+        with open(FILENAME, "w", encoding="utf-8") as f:
+            print("ALBUM           | ", ALBUM, file=f)
+            print("ALBUMARTIST     | ", ALBUMARTIST, file=f)
+            print('ALBUMSORT       | ', ALBUMSORT, file=f)
+            print('ARTIST          | ', ARTIST, file=f)
+            print('ARTISTSORT      | ', ARTISTSORT, file=f)
+            if ARTISTS:
+                for artists in ARTISTS:
+                    print('ARTISTS         | ', artists, file=f)
+            print('COMPILATION     | ', COMPILATION, file=f)
+            print('COPYRIGTH       | ', COPYRIGHT, file=f)
+            print('DISCNUMBER      | ', DISCNUMBER, file=f)
+            print('GENRE           | ', GENRE, file=f)
+            print("ITUNESADVISORY  | ", ITUNESADVISORY, file=f)
+            print("ITUNESALBUMID   | ", ITUNESALBUMID, file=f)
+            print("ITUNESARTISTID  | ", ITUNESARTISTID, file=f)
+            print("ITUNESCATALOGID | ", ITUNESCATALOGID, file=f)
+            print('ITUNESGENREID   | ', ITUNESGENREID, file=f)
+            print('ITUNESGAPLESS   | ', ITUNESGAPLESS, file=f)
+            print('ITUNESMEDIATYPE | ', ITUNESMEDIATYPE, file=f)
+            print("TITLE           | ", TITLE, file=f)
+            print("TITLESORT       | ", TITLESORT, file=f)
+            print("TOTALDISCS      | ", TOTALDISCS, file=f)
+            print("TOTALTRACKS     | ", TOTALTRACKS, file=f)
+            print("TRACK           | ", TRACKNUMBER, file=f)
+            print("YEAR            | ", YEAR, file=f)
+
+        # Find the <source> element with type="image/jpeg"
+
+        source_elem = driver.find_element(By.CSS_SELECTOR, 'source[type="image/jpeg"]')
+        srcset = source_elem.get_attribute("srcset")
+
+        # Extract the last URL before '632w'
+
+        urls = re.findall(r'(https?://[^\s,]+)\s+\d+w', srcset)
+        if urls:
+            last_url = urls[-1]
+            img_data = requests.get(last_url).content
+            app_dir = os.path.dirname(os.path.abspath(__file__))
+            image_path = os.path.join(metadata_dir, 'artwork.jpg')
+
+            with open(image_path, 'wb') as handler:
+                handler.write(img_data)
+
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
 
@@ -274,11 +365,7 @@ while not quit:
     match choice:
         case '1':
 
-            TOTALDISCS = 1
-            DISCNUMBER = 1
-            COMPILATION = 0
-            ITUNESGAPLESS = 0
-            ITUNESMEDIATYPE = "Normal"
+            
 
             title = input("Enter the name of the song/album: ")
             artist = input("Enter the name of the artist: ")
@@ -287,7 +374,7 @@ while not quit:
 
             options = webdriver.ChromeOptions()
             options.add_experimental_option('excludeSwitches', ['enable-logging'])
-            options.add_argument("--headless=new")
+            options.add_argument("--headless")
             options.add_argument("--log-level=3")
             options.add_argument("--disable-logging")
             options.add_argument("--disable-gpu")
@@ -324,76 +411,7 @@ while not quit:
 
             if not abort:
 
-                url, ITUNESALBUMID = ExtractAlbumID(driver, id)
-
-                driver.get(url)
-
-                ALBUM = ExtractAlbumTitle(driver)
-                ALBUMSORT = ALBUM
-                ALBUMARTIST, ITUNESARTISTID = ExtractArtistAndID(driver)
-                GENRE = ExtractGenre(driver)
-                ITUNESGENREID = GenreSelection(GENRE)
-                COPYRIGHT, YEAR = ExtractCopyrightAndDate(driver)
-
-                songs_elem = driver.find_elements(By.CLASS_NAME, 'songs-list-row')
-
-                TOTALTRACKS = len(songs_elem)
-
-                for song in songs_elem:
-
-                    
-                    ITUNESCATALOGID = ExtractCatalogID(song)
-                    TITLE = ExtractSongTitle(song)
-                    TITLESORT = TITLE
-                    TRACKNUMBER = ExtractTrackNumber(song)
-                    ITUNESADVISORY = ExtractItunesAdvisory(song)
-                    ARTIST, ARTISTS = ExtractArtists(song, ALBUMARTIST)
-                    ARTISTSORT = ARTIST
-                    
-                    FILENAME = os.path.join(metadata_dir, TRACKNUMBER + " " + TITLE + ".txt")
-                    with open(FILENAME, "w", encoding="utf-8") as f:
-                        print("ALBUM           | ", ALBUM, file=f)
-                        print("ALBUMARTIST     | ", ALBUMARTIST, file=f)
-                        print('ALBUMSORT       | ', ALBUMSORT, file=f)
-                        print('ARTIST          | ', ARTIST, file=f)
-                        print('ARTISTSORT      | ', ARTISTSORT, file=f)
-                        if ARTISTS:
-                            for artists in ARTISTS:
-                                print('ARTISTS         | ', artists, file=f)
-                        print('COMPILATION     | ', COMPILATION, file=f)
-                        print('COPYRIGTH       | ', COPYRIGHT, file=f)
-                        print('DISCNUMBER      | ', DISCNUMBER, file=f)
-                        print('GENRE           | ', GENRE, file=f)
-                        print("ITUNESADVISORY  | ", ITUNESADVISORY, file=f)
-                        print("ITUNESALBUMID   | ", ITUNESALBUMID, file=f)
-                        print("ITUNESARTISTID  | ", ITUNESARTISTID, file=f)
-                        print("ITUNESCATALOGID | ", ITUNESCATALOGID, file=f)
-                        print('ITUNESGENREID   | ', ITUNESGENREID, file=f)
-                        print('ITUNESGAPLESS   | ', ITUNESGAPLESS, file=f)
-                        print('ITUNESMEDIATYPE | ', ITUNESMEDIATYPE, file=f)
-                        print("TITLE           | ", TITLE, file=f)
-                        print("TITLESORT       | ", TITLESORT, file=f)
-                        print("TOTALDISCS      | ", TOTALDISCS, file=f)
-                        print("TOTALTRACKS     | ", TOTALTRACKS, file=f)
-                        print("TRACK           | ", TRACKNUMBER, file=f)
-                        print("YEAR            | ", YEAR, file=f)
-
-                # Find the <source> element with type="image/jpeg"
-
-                source_elem = driver.find_element(By.CSS_SELECTOR, 'source[type="image/jpeg"]')
-                srcset = source_elem.get_attribute("srcset")
-
-                # Extract the last URL before '632w'
-
-                urls = re.findall(r'(https?://[^\s,]+)\s+\d+w', srcset)
-                if urls:
-                    last_url = urls[-1]
-                    img_data = requests.get(last_url).content
-                    app_dir = os.path.dirname(os.path.abspath(__file__))
-                    image_path = os.path.join(metadata_dir, 'artwork.jpg')
-
-                    with open(image_path, 'wb') as handler:
-                        handler.write(img_data)
+                ExtractMetadata(driver, id)
 
                 print(Fore.GREEN + '\nMetadata retrieved successfully. Access it in the metadata folder.')
 
